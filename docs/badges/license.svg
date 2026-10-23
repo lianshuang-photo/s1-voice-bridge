@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="24" role="img" aria-label="license: GPL-3.0">
+  <title>license: GPL-3.0</title>
+  <defs><clipPath id="r"><rect width="128" height="24" rx="5"/></clipPath></defs>
+  <g clip-path="url(#r)"><rect width="56" height="24" fill="#475569"/><rect x="56" width="72" height="24" fill="#f97316"/></g>
+  <g fill="white" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif" font-size="11.5" text-anchor="middle">
+    <text x="28.0" y="16">license</text><text x="92.0" y="16" font-weight="600">GPL-3.0</text>
+  </g>
+</svg>

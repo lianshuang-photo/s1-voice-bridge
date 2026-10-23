@@ -1,21 +1,64 @@
-<p align="center"><img src="Assets/AppIcon.png" width="112" alt="S1 Voice Bridge"></p>
+<p align="center"><img src="docs/images/app-icon.png" width="116" alt="S1 Voice Bridge 图标"></p>
 
-# S1 Voice Bridge
+<h1 align="center">S1 Voice Bridge</h1>
 
-把讯飞 T8 附带的 **S1 语音夹**变成 macOS 上的无线“按住说话”按钮：由 S1 收音，通过虚拟麦克风交给豆包、微信、Codex 等语音输入工具，按钮同时触发你指定的快捷键。
+<p align="center"><b>把讯飞 S1 语音夹，变成 Mac 上的无线「按住说话」按钮。</b></p>
+<p align="center">按下收音 · 松开结束 · 唤醒自动连接</p>
 
-**v0.2.2 · Apple Silicon / macOS 13+ · 非官方实验工具**
+<p align="center">
+  <a href="README.md"><img src="docs/badges/zh-active.svg" alt="简体中文"></a>
+  <a href="README.en.md"><img src="docs/badges/en.svg" alt="English README"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/lianshuang-photo/s1-voice-bridge/releases/latest"><img src="docs/badges/release.svg" alt="正式版本 v0.2.2"></a>
+  <img src="docs/badges/macos.svg" alt="macOS 13 或更高版本">
+  <img src="docs/badges/arch.svg" alt="Apple Silicon arm64">
+  <a href="LICENSE"><img src="docs/badges/license.svg" alt="GPL-3.0 License"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/lianshuang-photo/s1-voice-bridge/releases/download/v0.2.2/S1-Voice-Bridge-v0.2.2-macOS-arm64.zip"><img src="docs/badges/download.svg" alt="下载 macOS 安装包"></a>
+</p>
+
+<p align="center">
+  <a href="#安装与首次测试">快速上手</a> ·
+  <a href="https://github.com/lianshuang-photo/s1-voice-bridge/releases/tag/v0.2.2">更新说明</a> ·
+  <a href="https://github.com/lianshuang-photo/s1-voice-bridge/issues">问题反馈</a>
+</p>
+
+---
+
+S1 Voice Bridge 接收讯飞 T8 附带的 **S1 语音夹**的蓝牙收音和按钮事件，通过 **S1 Bridge Audio 虚拟麦克风**把声音交给语音输入工具，同时触发你指定的快捷键。让手边的小麦克风成为写代码、聊天和整理文字时的语音按钮。
+
+**当前正式版本：v0.2.2。** 这是独立开源项目，与讯飞、豆包、微信或 OpenAI 没有官方隶属关系。
+
+## 产品界面
+
+<p align="center"><img src="docs/images/app-overview.png" width="820" alt="S1 Voice Bridge 原生界面：自动连接、虚拟麦克风与 Fn 快捷键设置"></p>
+<p align="center"><sub>由 v0.2.2 的原生界面代码导出；设备信息和诊断内容使用示例数据。截图展示操作界面，不代表额外的硬件验收。</sub></p>
+
+<details>
+<summary><b>查看「等待 S1 唤醒，自动重连」界面</b></summary>
+
+<p align="center"><img src="docs/images/auto-reconnect.png" width="820" alt="等待记住的 S1 语音夹唤醒并重新连接的示例界面"></p>
+
+首次手动连接成功后会记住设备。保持 App 在菜单栏运行，S1 唤醒后即可尝试恢复连接。
+
+</details>
 
 ## 功能
 
-- 按住 S1 开始收音，松开后送完尾音并结束听写；不自动发送消息。
-- **自动连接**：记住最后一次成功连接的 S1，App 启动、设备掉线、麦克风重新唤醒后恢复连接。
-- 主动点击“断开”会暂停自动连接，点“立即重连”可恢复；也可关闭自动连接开关。
-- 电脑休眠时释放快捷键并停止收音，唤醒后恢复连接。
-- 关闭窗口后在菜单栏继续运行；菜单栏可重新显示窗口、连接、断开或退出。
-- 记住快捷键、按住/开关型触发、音频输出及联动开关；保留旧版设置。
-- 音量表、本地 WAV 测试录音与回放、诊断导出、最长录音限制、异常清理。
-- 新图标；发布包内置 Python 3.12，无需接收方另装 Python。
+| 功能 | 使用体验 |
+| --- | --- |
+| 🎙️ 按住说话 | 按下 S1 收音，松开后送完尾音并结束听写；不会自动发送消息。 |
+| 🔁 自动连接 | 记住上次成功连接的 S1，支持启动重连、掉线重试和电脑休眠恢复。 |
+| ⌨️ 快捷键联动 | 支持 Fn、自定义组合键，以及按住型或开关型语音输入。 |
+| 🎚️ 虚拟麦克风 | 把 S1 收音交给可选择麦克风的第三方输入工具。 |
+| 🧷 菜单栏常驻 | 关闭窗口后继续运行，保存快捷键、输出设备及联动设置。 |
+| 🔍 收音检查 | 音量表、本地 WAV 录音、回放、诊断导出与最长录音限制。 |
+
+发布包内置 Python 3.12，无需接收方另装 Python。
 
 ## 使用前提
 
@@ -71,13 +114,13 @@ App 显示“辅助功能已授权”时无需再次操作；从系统设置返�
 已完成 S1 真机连接、握手、实体按钮起止、16 kHz 音频解码和清晰回放；系统与豆包均识别了虚拟麦克风，使用者确认原始联动链路跑通。
 
 v0.2.0 新增的自动连接、暂停、退避、休眠恢复与设置迁移通过离线测试。便携包通过换目录、清理外部 Python 环境后的运行检查。
-新增自动重连仍需进一步进行真实开关/休眠验收；详细范围见 [验证记录](docs/VERIFICATION.md)。
+v0.2.2 更新后已观察到一次自动重连与握手成功；多轮设备开关、休眠和长时间待机仍需进一步验收。微信、Codex 等其他输入工具取决于其音频设备选择和快捷键支持，尚未逐一兼容验收。详细范围见 [验证记录](docs/VERIFICATION.md)。
 
 ## 数据与权限
 
 - 设置和最近设备标识只保存在本机：`~/Library/Application Support/S1VoiceBridgeDemo/`。
 - 本地录音位于其中的 `Recordings/`，可关闭“保存本地测试录音”。
-- `live-status.json` 仅保存状态、计数与近期诊断；导出诊断不附带音频或识别文本。
+- `live-status.json` 保存状态、计数与近期诊断；导出不附带音频或识别文本。对外分享诊断前仍应检查设备信息和文件路径。
 - App 本身不调用在线语音识别。开启联动后，由目标输入工具按其自己的设置处理声音。
 - 不修改讯飞安装包、不写固件、不读取讯飞账户和历史记录。
 - 不主动更改系统默认音频设备。如果输入工具只使用系统默认麦克风，需要你自行选择。
@@ -100,6 +143,8 @@ python3 scripts/package_release.py --version 0.2.2
 ```
 
 构建阶段只打包驱动，不执行系统安装或重启音频服务。`S1_PYTHON` 可指定构建用 Python 3.12。
+
+文档界面图可通过 `python3 scripts/render_readme_screenshots.py` 重新生成；它使用隔离的示例数据，不连接硬件或触发快捷键。
 
 ## 组成与许可
 
