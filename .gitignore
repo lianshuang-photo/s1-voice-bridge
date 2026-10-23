@@ -1,0 +1,8 @@
+build/
+dist/
+releases/
+__pycache__/
+*.pyc
+.DS_Store
+docs/build-receipt.txt
+docs/ARTIFACT-SHA256.json
