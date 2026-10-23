@@ -13,7 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 BUILD = ROOT / "build"
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 
 def run(args):
@@ -80,7 +80,7 @@ def main():
     info = {
         "CFBundleExecutable": "S1VoiceBridge", "CFBundleIdentifier": "local.cherry.s1voicebridge.demo",
         "CFBundleName": "S1 Voice Bridge", "CFBundleDisplayName": "S1 Voice Bridge",
-        "CFBundlePackageType": "APPL", "CFBundleVersion": "2", "CFBundleShortVersionString": VERSION,
+        "CFBundlePackageType": "APPL", "CFBundleVersion": "3", "CFBundleShortVersionString": VERSION,
         "CFBundleIconFile": "AppIcon.icns",
         "LSMinimumSystemVersion": "13.0", "NSHighResolutionCapable": True,
         "NSBluetoothAlwaysUsageDescription": "连接你选择的讯飞 S1，接收按钮事件和语音音频。",

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — 2026-10-23
+
+- Replace the app, Dock, and README icon with the white-haired, winking headset mascot.
+- Include the selected artwork and its ImageGen prompt in the source repository.
+- Update the portable release and launcher to 0.2.1; Bluetooth and audio behavior are unchanged.
+
 ## 0.2.0 — 2026-10-22
 
 - Remember the last successfully connected S1 and reconnect on launch or peripheral wake.

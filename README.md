@@ -4,7 +4,7 @@
 
 把讯飞 T8 附带的 **S1 语音夹**变成 macOS 上的无线“按住说话”按钮：由 S1 收音，通过虚拟麦克风交给豆包、微信、Codex 等语音输入工具，按钮同时触发你指定的快捷键。
 
-**v0.2.0 · Apple Silicon / macOS 13+ · 非官方实验工具**
+**v0.2.1 · Apple Silicon / macOS 13+ · 非官方实验工具**
 
 ## 功能
 
@@ -29,7 +29,7 @@
 
 ## 安装与首次测试
 
-从仓库 Releases 下载 `S1-Voice-Bridge-v0.2.0-macOS-arm64.zip`。
+从 [Releases 下载 S1-Voice-Bridge-v0.2.1-macOS-arm64.zip](https://github.com/lianshuang-photo/s1-voice-bridge/releases/download/v0.2.1/S1-Voice-Bridge-v0.2.1-macOS-arm64.zip)。
 
 1. 解压，把 **S1 Voice Bridge.app** 放到 `/Applications`，以后从固定位置运行。
 2. 首次授予 App 蓝牙权限，取出并唤醒 S1，点“扫描 S1 → 连接”。
@@ -93,8 +93,8 @@ dist/'S1 Voice Bridge.app'/Contents/MacOS/S1VoiceBridge --self-test
 构建便携包需要 uv / python-build-standalone 提供的 CPython 3.12：
 
 ```sh
-python3 scripts/build.py --output releases/v0.2.0 --portable
-python3 scripts/package_release.py --version 0.2.0
+python3 scripts/build.py --output releases/v0.2.1 --portable
+python3 scripts/package_release.py --version 0.2.1
 ```
 
 构建阶段只打包驱动，不执行系统安装或重启音频服务。`S1_PYTHON` 可指定构建用 Python 3.12。

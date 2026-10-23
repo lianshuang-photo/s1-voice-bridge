@@ -1,9 +1,11 @@
 # App icon
 
-Generated with the built-in ImageGen tool on 2026-10-22.
+Generated with the built-in ImageGen tool; selected for v0.2.1 on 2026-10-23.
 
-Source asset: `AppIcon.png`. The build converts it into a multi-resolution macOS `.icns` and uses it in the app header.
+Source asset: `AppIcon.png` — a white-haired, winking anime headset mascot on a pale-apricot tile. The build converts this transparent PNG into a multi-resolution macOS `.icns` and uses it in the app header.
+
+The edit reference was an original headset mascot concept generated for this project with ImageGen.
 
 ## Prompt
 
-Use case: logo-brand. Asset type: a finished macOS app icon for S1 Voice Bridge, a small Bluetooth microphone utility with push-to-talk. Create ONE square 1024x1024 icon, not a presentation sheet or mockup. A beautifully simple, instantly legible white microphone capsule with an elegant U-shaped support/bridge, centered on a warm vivid orange rounded-square tile, matching a clean orange-and-white utility app. A tiny cool blue indicator dot subtly suggests a wireless connection. The microphone should occupy about 60% of the tile, with bold clean geometry that reads at 16 px. Subtle tactile depth and restrained soft lighting, sophisticated native Mac utility aesthetic, no glossy toy look. Full icon centered with even margins; outside the rounded-square tile is truly transparent. No text, no letters, no numbers, no watermark, no stock logos, no surrounding objects, no drop shadow outside the tile.
+Use case: identity-preserve / logo-brand. The provided image is the edit target and exact identity reference. Create ONE new anime app-icon portrait of the SAME original adult woman, preserving the short ivory-white bob, amber-orange eyes, orange waveform hair clip, navy headset with a large orange ear cup, cyan microphone tip, and modest navy collar. Direction D3: a cheerful energetic expression, one eye winking and the other bright amber eye open, a happy small open-mouth smile, and a light head tilt toward the opposite side from the reference. Keep the same recognizable face and accessories; do not add hands or a peace sign. Use a soft pale-apricot rounded-square background with only two tiny restrained cyan sparkle accents. Clean high-quality Japanese anime linework and graphic cel shading, head dominant, playful but tasteful, not a baby or doll. No text, watermark, existing franchise features or busy scenery. Keep the whole head within the square app icon with comfortable margins; transparent exterior outside the tile.

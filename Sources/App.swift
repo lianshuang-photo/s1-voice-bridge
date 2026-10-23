@@ -15,7 +15,7 @@ struct ContentView: View {
                         Text("按住说话 · 松开结束 · 使用讯飞 S1 收音").foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("v0.2.0\n蓝牙自动连接").font(.caption.monospaced()).multilineTextAlignment(.trailing).foregroundStyle(.secondary)
+                    Text("v0.2.1\n蓝牙自动连接").font(.caption.monospaced()).multilineTextAlignment(.trailing).foregroundStyle(.secondary)
                 }
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {

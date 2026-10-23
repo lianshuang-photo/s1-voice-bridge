@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version", default="0.2.0")
+    parser.add_argument("--version", default="0.2.1")
     args = parser.parse_args()
     version = args.version
     output = ROOT / "releases" / f"v{version}"
@@ -38,7 +38,7 @@ def main():
 7. 关闭窗口后在菜单栏继续运行，点“退出”才完全停止。
 
 更新后权限提示：在辅助功能移除旧版本，再添加 /Applications 中的新版本。
-首次发布为本地 ad-hoc 签名，未做 Apple 公证。
+当前发布包为本地 ad-hoc 签名，未做 Apple 公证。
 已含 Python 3.12，无需另外安装 Python；讯飞组件不随包分发。
 原始收音/输入链路已真机跑通，新增自动重连通过离线测试，需进一步开关/休眠验收。
 完整源码、测试与说明见同一 GitHub 仓库。
