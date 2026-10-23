@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 — 2026-10-23
+
+- Compile a native macOS icon stack so Tahoe no longer shrinks the mascot inside a grey compatibility tile; include the system-generated fallback for older macOS.
+- Show the granted Accessibility state, refresh it when the app becomes active, and avoid requesting an already-granted permission.
+- Keep ad-hoc signing for GitHub preview releases; describe removing an old permission entry only as troubleshooting when authorization is not recognized.
+
 ## 0.2.1 — 2026-10-23
 
 - Replace the app, Dock, and README icon with the white-haired, winking headset mascot.

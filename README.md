@@ -4,7 +4,7 @@
 
 把讯飞 T8 附带的 **S1 语音夹**变成 macOS 上的无线“按住说话”按钮：由 S1 收音，通过虚拟麦克风交给豆包、微信、Codex 等语音输入工具，按钮同时触发你指定的快捷键。
 
-**v0.2.1 · Apple Silicon / macOS 13+ · 非官方实验工具**
+**v0.2.2 · Apple Silicon / macOS 13+ · 非官方实验工具**
 
 ## 功能
 
@@ -29,7 +29,7 @@
 
 ## 安装与首次测试
 
-从 [Releases 下载 S1-Voice-Bridge-v0.2.1-macOS-arm64.zip](https://github.com/lianshuang-photo/s1-voice-bridge/releases/download/v0.2.1/S1-Voice-Bridge-v0.2.1-macOS-arm64.zip)。
+从 [Releases 下载 S1-Voice-Bridge-v0.2.2-macOS-arm64.zip](https://github.com/lianshuang-photo/s1-voice-bridge/releases/download/v0.2.2/S1-Voice-Bridge-v0.2.2-macOS-arm64.zip)。
 
 1. 解压，把 **S1 Voice Bridge.app** 放到 `/Applications`，以后从固定位置运行。
 2. 首次授予 App 蓝牙权限，取出并唤醒 S1，点“扫描 S1 → 连接”。
@@ -49,6 +49,8 @@
 默认 `Control + Shift + D` 只是示例，目标软件的快捷键应以当前设置为准。如果目标工具按一次开始、再次按键结束，可选“开关型”。
 
 ## 更新后反复提示授权
+
+App 显示“辅助功能已授权”时无需再次操作；从系统设置返回 App 会自动刷新状态。
 
 当前发布包使用本地 ad-hoc 签名，尚未做 Apple 公证。新版本的签名指纹会变化，macOS 可能保留旧版本的权限条目。
 若开关已开启，App 仍提示未授权：在辅助功能列表移除旧的 S1 Voice Bridge，再从固定的 `/Applications/S1 Voice Bridge.app` 添加新版本，打开开关后重新运行 App。
@@ -82,7 +84,7 @@ v0.2.0 新增的自动连接、暂停、退避、休眠恢复与设置迁移通�
 
 ## 从源码构建
 
-开发需要 Xcode Command Line Tools、Python 3.12 与已安装的讯飞语音助手。
+开发需要 Xcode 26 或更高版本（含 `actool` 图标编译器）、Python 3.12 与已安装的讯飞语音助手。
 
 ```sh
 python3 scripts/build.py
@@ -93,8 +95,8 @@ dist/'S1 Voice Bridge.app'/Contents/MacOS/S1VoiceBridge --self-test
 构建便携包需要 uv / python-build-standalone 提供的 CPython 3.12：
 
 ```sh
-python3 scripts/build.py --output releases/v0.2.1 --portable
-python3 scripts/package_release.py --version 0.2.1
+python3 scripts/build.py --output releases/v0.2.2 --portable
+python3 scripts/package_release.py --version 0.2.2
 ```
 
 构建阶段只打包驱动，不执行系统安装或重启音频服务。`S1_PYTHON` 可指定构建用 Python 3.12。

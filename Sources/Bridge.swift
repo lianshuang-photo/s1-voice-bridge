@@ -319,6 +319,9 @@ final class BridgeModel: ObservableObject {
     func refreshAudio() {
         audioDevices = AudioDevices.all()
         if settings.outputUID.isEmpty, let candidate = loopbacks.first { settings.outputUID = candidate.uid }
+        refreshAccessibility()
+    }
+    func refreshAccessibility() {
         accessibility = HotkeyOutput.trusted
     }
     func handle(_ msg: [String: Any]) {

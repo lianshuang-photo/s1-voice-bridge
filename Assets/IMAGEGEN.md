@@ -4,6 +4,8 @@ Generated with the built-in ImageGen tool; selected for v0.2.1 on 2026-10-23.
 
 Source asset: `AppIcon.png` — a white-haired, winking anime headset mascot on a pale-apricot tile. The build converts this transparent PNG into a multi-resolution macOS `.icns` and uses it in the app header.
 
+Since v0.2.2, `AppIcon.icon` packages the same illustration as a native macOS icon stack. Its artwork is a 1024-pixel resize of the selected PNG; the icon layout supplies an opaque apricot background, 1.12 scale, and a 20-point downward offset so the jacket meets the bottom of the system mask without a background strip. Xcode's asset compiler produces `Assets.car` and the legacy `.icns` fallback. The character artwork has not been regenerated.
+
 The edit reference was an original headset mascot concept generated for this project with ImageGen.
 
 ## Prompt

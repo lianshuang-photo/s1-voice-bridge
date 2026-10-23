@@ -15,6 +15,7 @@ final class HotkeyOutput {
     var observer: ((String) -> Void)?
     static var trusted: Bool { AXIsProcessTrusted() }
     static func requestPermission() {
+        guard !trusted else { return }
         let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
         _ = AXIsProcessTrustedWithOptions(options)
     }

@@ -15,7 +15,7 @@ struct ContentView: View {
                         Text("按住说话 · 松开结束 · 使用讯飞 S1 收音").foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("v0.2.1\n蓝牙自动连接").font(.caption.monospaced()).multilineTextAlignment(.trailing).foregroundStyle(.secondary)
+                    Text("v0.2.2\n蓝牙自动连接").font(.caption.monospaced()).multilineTextAlignment(.trailing).foregroundStyle(.secondary)
                 }
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
@@ -80,7 +80,12 @@ struct ContentView: View {
                                 if model.shortcutCapture { Button("取消录入") { model.cancelShortcut() } }
                                 else { Button("录入快捷键") { model.recordShortcut() } }
                                 Button("Fn") { model.settings.shortcut = Shortcut(keyCode: 63, flags: 0, label: "Fn") }
-                                Button("辅助功能授权") { HotkeyOutput.requestPermission(); model.refreshAudio() }
+                                if model.accessibility {
+                                    Label("辅助功能已授权", systemImage: "checkmark.circle.fill")
+                                        .font(.caption).foregroundStyle(.green)
+                                } else {
+                                    Button("授权辅助功能…") { HotkeyOutput.requestPermission(); model.refreshAccessibility() }
+                                }
                             }
                             if model.shortcutCapture { Text("现在按目标快捷键；Esc 取消。 ").foregroundStyle(.orange) }
                             Picker("目标快捷键的操作方式", selection: $model.settings.triggerMode) {
@@ -163,6 +168,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         model.startAutoConnection()
     }
     @objc private func showWindow() { window?.makeKeyAndOrderFront(nil); NSApplication.shared.activate(ignoringOtherApps: true) }
+    func applicationDidBecomeActive(_ notification: Notification) { model.refreshAccessibility() }
     @objc private func connectionAction() {
         if model.connected || model.connecting { model.disconnect() }
         else if model.settings.lastDeviceID.isEmpty { showWindow() }

@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version", default="0.2.1")
+    parser.add_argument("--version", default="0.2.2")
     args = parser.parse_args()
     version = args.version
     output = ROOT / "releases" / f"v{version}"
@@ -37,7 +37,8 @@ def main():
 6. 豆包长按模式若为 Fn，App 也选 Fn + 按住型。不会自动提交消息。
 7. 关闭窗口后在菜单栏继续运行，点“退出”才完全停止。
 
-更新后权限提示：在辅助功能移除旧版本，再添加 /Applications 中的新版本。
+辅助功能显示“已授权”时无需再次操作。当前测试版更新后可能需要重新授权；
+仅当系统开关已开启、App 仍提示未授权时，移除旧条目，再添加 /Applications 中的新版本。
 当前发布包为本地 ad-hoc 签名，未做 Apple 公证。
 已含 Python 3.12，无需另外安装 Python；讯飞组件不随包分发。
 原始收音/输入链路已真机跑通，新增自动重连通过离线测试，需进一步开关/休眠验收。

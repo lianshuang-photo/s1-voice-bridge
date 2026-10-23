@@ -13,7 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
 BUILD = ROOT / "build"
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 
 
 def run(args):
@@ -80,27 +80,29 @@ def main():
     info = {
         "CFBundleExecutable": "S1VoiceBridge", "CFBundleIdentifier": "local.cherry.s1voicebridge.demo",
         "CFBundleName": "S1 Voice Bridge", "CFBundleDisplayName": "S1 Voice Bridge",
-        "CFBundlePackageType": "APPL", "CFBundleVersion": "3", "CFBundleShortVersionString": VERSION,
+        "CFBundlePackageType": "APPL", "CFBundleVersion": "4", "CFBundleShortVersionString": VERSION,
         "CFBundleIconFile": "AppIcon.icns",
         "LSMinimumSystemVersion": "13.0", "NSHighResolutionCapable": True,
         "NSBluetoothAlwaysUsageDescription": "连接你选择的讯飞 S1，接收按钮事件和语音音频。",
         "NSMicrophoneUsageDescription": "通过虚拟音频设备将 S1 收音交给目标输入工具。",
         "NSPrincipalClass": "NSApplication",
     }
-    (app / "Contents/Info.plist").write_bytes(plistlib.dumps(info))
     shutil.copytree(ROOT / "backend", resources / "backend", dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     shutil.copy2(package, resources / package.name)
     shutil.copy2(ROOT / "README.md", resources / "README.md")
     shutil.copy2(vendor / "LICENSE", resources / "BlackHole-LICENSE")
     icon = ROOT / "Assets/AppIcon.png"
     if icon.exists():
-        iconset = BUILD / "AppIcon.iconset"; iconset.mkdir(exist_ok=True)
-        for size in (16, 32, 128, 256, 512):
-            for scale in (1, 2):
-                name = f"icon_{size}x{size}" + ("@2x" if scale == 2 else "") + ".png"
-                subprocess.run(["sips", "-z", str(size*scale), str(size*scale), str(icon), "--out", str(iconset/name)], check=True, capture_output=True)
-        run(["iconutil", "-c", "icns", iconset, "-o", resources / "AppIcon.icns"])
+        # Tahoe otherwise wraps a legacy-only ICNS in a grey compatibility tile.
+        # Compile a native icon stack plus Apple's fallback for earlier macOS.
+        icon_info = BUILD / "app-icon-info.plist"
+        run(["xcrun", "actool", ROOT / "Assets/AppIcon.icon", "--compile", resources,
+             "--platform", "macosx", "--minimum-deployment-target", "13.0",
+             "--app-icon", "AppIcon", "--output-partial-info-plist", icon_info,
+             "--output-format", "human-readable-text"])
+        info.update(plistlib.loads(icon_info.read_bytes()))
         shutil.copy2(icon, resources / "Brandmark.png")
+    (app / "Contents/Info.plist").write_bytes(plistlib.dumps(info))
     path_file = resources / "python-path.txt"
     if args.portable:
         prefix = Path(subprocess.check_output([python, "-c", "import sys; print(sys.base_prefix)"], text=True).strip())
