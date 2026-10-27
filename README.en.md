@@ -33,6 +33,8 @@ S1 Voice Bridge receives Bluetooth audio and button events from the **S1 voice c
 
 **Current release: v0.2.2.** This is an independent open-source project, unaffiliated with iFLYTEK, Doubao, WeChat, or OpenAI.
 
+**v0.3.0 preview adds a wired-headset mode** for single-button remotes on the built-in 3.5mm jack. [Download the preview](https://github.com/lianshuang-photo/s1-voice-bridge/releases/tag/v0.3.0) · [Headset guide / 耳机说明](docs/HEADSET.md). It uses the microphone selected in your input tool directly, without the iFLYTEK assistant or a virtual audio driver.
+
 ## Product preview
 
 <p align="center"><img src="docs/images/app-overview.png" width="820" alt="Native S1 Voice Bridge interface showing automatic connection, virtual microphone routing, and Fn shortcut settings"></p>
@@ -61,6 +63,8 @@ After the first successful manual connection, the app remembers your S1. Keep it
 The portable release includes Python 3.12, so users do not need to install Python separately.
 
 ## Requirements
+
+These requirements apply to **S1 mode**. Wired-headset mode has separate device and permission requirements in the [headset guide](docs/HEADSET.md).
 
 1. An **Apple Silicon Mac running macOS 13+**. Hardware testing so far used macOS 26.2.
 2. **The S1 voice clip bundled with the iFLYTEK T8.** The S1 and the keyboard are separate devices; connecting only the keyboard is not enough.
@@ -139,12 +143,14 @@ dist/'S1 Voice Bridge.app'/Contents/MacOS/S1VoiceBridge --self-test
 For a portable release, use a CPython 3.12 runtime from uv / python-build-standalone:
 
 ```sh
-python3 scripts/build.py --output releases/v0.2.2 --portable
-python3 scripts/package_release.py --version 0.2.2
-python3 scripts/verify_release.py releases/v0.2.2/S1-Voice-Bridge-v0.2.2-macOS-arm64.zip
+python3 scripts/build.py --output releases/v0.3.0 --portable
+python3 scripts/package_release.py --version 0.3.0
+python3 scripts/verify_release.py releases/v0.3.0/S1-Voice-Bridge-v0.3.0-macOS-arm64.zip
 ```
 
 Building only creates the audio installer; it does not install it or restart the audio service. Set `S1_PYTHON` to select a Python 3.12 interpreter. To regenerate the native UI documentation images, run `python3 scripts/render_readme_screenshots.py`; it uses isolated sample data without connecting to hardware or sending shortcuts.
+
+Use `S1VoiceBridge --self-test-core` for checks that do not require the iFLYTEK installation. `--self-test` additionally verifies the local vendor protocol worker.
 
 ## License and acknowledgments
 

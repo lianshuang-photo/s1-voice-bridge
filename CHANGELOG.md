@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 preview — 2026-10-27
+
+- Add a separate wired-headset mode with explicit, device-scoped takeover of the built-in analogue headset remote.
+- Default to click-to-start/click-to-stop so the microphone can capture speech after the physical button is released; keep hold-to-talk available for other microphone arrangements.
+- Reuse shortcut settings on first setup, and store headset settings independently from S1 settings.
+- Release input on stop, mode switch, unplug detection, sleep, timeout and normal app exit; pause S1 while headset mode is active.
+- Show Input Monitoring and Accessibility status, a menu bar activity indicator, and a one-click return to system headset controls.
+- Add core-only self-tests for gesture handling, cancellation, permission defaults and device matching.
+- Keep headset events and safety timers running while menus track input; preserve modifiers in custom Fn shortcuts.
+- Cancel an unfinished S1 shortcut recording when switching input modes.
+
 ## 0.2.2 — 2026-10-23
 
 - Publish v0.2.2 as a regular GitHub release using the existing verified binary; add bilingual READMEs, language buttons, download badges, and native UI previews.

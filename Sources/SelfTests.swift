@@ -1,7 +1,8 @@
 import Foundation
+import ApplicationServices
 
 enum SelfTests {
-    static func run() -> Int32 {
+    static func run(includeVendorProbe: Bool = true) -> Int32 {
         var failures: [String] = []
         func check(_ condition: @autoclosure () -> Bool, _ message: String) { if !condition() { failures.append(message) } }
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("s1-self-test-\(UUID().uuidString)")
@@ -51,6 +52,53 @@ enum SelfTests {
         try? keys.begin(Shortcut(keyCode: 63, flags: 0, label: "Fn"), mode: "toggle"); keys.end()
         check(events == ["down", "up", "down", "up"], "开关型起止各一次")
 
+        var click = HeadsetGesture()
+        check(click.receive(down: true, interaction: "click") == nil, "点按模式按下时不触发输入")
+        check(click.receive(down: true, interaction: "click") == nil, "重复按下不触发两次")
+        check(click.receive(down: false, interaction: "click") == .start && click.active, "点按模式在释放麦克风线路后开始")
+        check(click.receive(down: false, interaction: "click") == nil, "重复松开不结束本次输入")
+        _ = click.receive(down: true, interaction: "click")
+        check(click.receive(down: false, interaction: "click") == .stop && !click.active, "第二次点按结束输入")
+        var hold = HeadsetGesture()
+        check(hold.receive(down: true, interaction: "hold") == .start, "按住模式立即触发")
+        hold.cancel()
+        check(hold.receive(down: true, interaction: "hold") == nil, "紧急停止后忽略重复按下")
+        check(hold.receive(down: false, interaction: "hold") == nil, "停止后松开不再触发快捷键")
+        check(hold.receive(down: true, interaction: "hold") == .start, "新的完整按压可以重新开始")
+        check(hold.receive(down: false, interaction: "hold") == .stop, "松开正确结束按住模式")
+        check(HeadsetCapture.matches(product: "Headset", transport: "Audio", page: 12, usage: 1), "允许目标音频接口线控")
+        check(!HeadsetCapture.matches(product: "Headset", transport: "USB", page: 12, usage: 1), "不接管 USB 耳机")
+        check(!HeadsetCapture.matches(product: "S1", transport: "Bluetooth", page: 1, usage: 6), "不接管 S1 蓝牙键盘接口")
+        check(!HeadsetCapture.matches(product: "Headset", transport: "Audio", page: 1, usage: 6), "不接管键盘用途设备")
+        if let defaults = try? JSONDecoder().decode(HeadsetSettings.self, from: Data("{}".utf8)) {
+            check(!defaults.enabled && defaults.interaction == "click", "首次使用不自动抢占线控，默认点按开关")
+        } else { failures.append("耳机设置默认值解码失败") }
+        let headset = WiredHeadsetModel(directory: root.appendingPathComponent("headset"), initialShortcut: Shortcut())
+        headset.keys.dryRun = true
+        events = []; headset.keys.observer = { events.append($0) }
+        try? headset.keys.begin(Shortcut(), mode: "hold")
+        headset.systemWillSleep()
+        check(events == ["down", "up"], "耳机模式休眠时释放本应用快捷键")
+        events = []
+        try? headset.keys.begin(Shortcut(), mode: "hold")
+        headset.deactivate()
+        check(events == ["down", "up"] && headset.capture.registryID == nil, "切换模式时释放按键及设备")
+        check(headset.settings.shortcut == Shortcut(), "首次耳机设置复用原快捷键")
+        let fnCombo = Shortcut(keyCode: 63, flags: CGEventFlags.maskControl.rawValue, label: "Control + Fn")
+        let fnDown = HotkeyOutput.makeEvent(fnCombo, down: true), fnUp = HotkeyOutput.makeEvent(fnCombo, down: false)
+        check(fnDown?.type == .flagsChanged && fnDown?.flags.contains(.maskControl) == true && fnDown?.flags.contains(.maskSecondaryFn) == true, "Fn 组合键保留修饰键；仅构造事件不发送")
+        check(fnUp?.flags.isEmpty == true, "Fn 组合键结束时释放标志")
+        let tracking = RunLoop.Mode("NSEventTrackingRunLoopMode")
+        CFRunLoopAddCommonMode(CFRunLoopGetMain(), CFRunLoopMode(rawValue: tracking.rawValue as CFString))
+        var timerFired = false
+        let timer = HeadsetScheduling.timer(every: 0.01) { _ in timerFired = true }
+        let timerDeadline = Date().addingTimeInterval(0.2)
+        while !timerFired && Date() < timerDeadline {
+            if !RunLoop.main.run(mode: tracking, before: Date().addingTimeInterval(0.01)) { Thread.sleep(forTimeInterval: 0.001) }
+        }
+        timer.invalidate()
+        check(timerFired, "菜单跟踪期间耳机计时和拔插检查仍可运行")
+
         let model = BridgeModel(directory: root)
         model.connected = true; model.handshake = true
         model.settings.routeToApps = false; model.settings.tailMilliseconds = 0
@@ -83,21 +131,23 @@ enum SelfTests {
 
         // Exercise the packaged Python worker over real pipes, without opening
         // Bluetooth or issuing a hardware command.
-        let worker = ProtocolWorker()
-        var workerEvents: [String] = []
-        worker.onEvent = { workerEvents.append($0["event"] as? String ?? "unknown") }
-        do {
-            try worker.launch()
-            let deadline = Date().addingTimeInterval(4)
-            while !workerEvents.contains("ready") && Date() < deadline { RunLoop.main.run(until: Date().addingTimeInterval(0.02)) }
-            check(workerEvents.contains("ready"), "App 到 Python 的实际通信")
-            worker.send("start")
-            let errorDeadline = Date().addingTimeInterval(1)
-            while !workerEvents.contains("error") && Date() < errorDeadline { RunLoop.main.run(until: Date().addingTimeInterval(0.02)) }
-            check(workerEvents.contains("error"), "未连接时拒绝录音")
-            worker.stop()
-        } catch { failures.append("协议子进程启动失败：\(error)") }
-        if failures.isEmpty { print("PASS: reconnect policy and cancellation, settings migration, native lifecycle, hotkeys, PCM/WAV, fault cleanup, packaged worker IPC (no hardware)"); return 0 }
+        if includeVendorProbe {
+            let worker = ProtocolWorker()
+            var workerEvents: [String] = []
+            worker.onEvent = { workerEvents.append($0["event"] as? String ?? "unknown") }
+            do {
+                try worker.launch()
+                let deadline = Date().addingTimeInterval(4)
+                while !workerEvents.contains("ready") && Date() < deadline { RunLoop.main.run(until: Date().addingTimeInterval(0.02)) }
+                check(workerEvents.contains("ready"), "App 到 Python 的实际通信")
+                worker.send("start")
+                let errorDeadline = Date().addingTimeInterval(1)
+                while !workerEvents.contains("error") && Date() < errorDeadline { RunLoop.main.run(until: Date().addingTimeInterval(0.02)) }
+                check(workerEvents.contains("error"), "未连接时拒绝录音")
+                worker.stop()
+            } catch { failures.append("协议子进程启动失败：\(error)") }
+        }
+        if failures.isEmpty { print("PASS: reconnect policy, settings migration, S1 lifecycle, headset click/hold/cleanup and device scope, hotkeys, PCM/WAV; vendor IPC \(includeVendorProbe ? "checked" : "skipped") (no hardware)"); return 0 }
         failures.forEach { print("FAIL: \($0)") }; return 1
     }
 }

@@ -281,6 +281,13 @@ final class BridgeModel: ObservableObject {
         autoStarted = true
         applyAutoSettings(resume: true)
     }
+    func pauseForOtherInput() {
+        cancelShortcut()
+        autoStarted = false; cancelRetry(); reconnect.pause(); clearConnectionState()
+        status = "S1 模式已暂停；切回后恢复自动连接。"
+        autoConnectStatus = status
+        persistDiagnosticStatus()
+    }
     private func applyAutoSettings(resume: Bool) {
         cancelRetry()
         reconnect.enabled = settings.autoConnect

@@ -33,6 +33,8 @@ S1 Voice Bridge 接收讯飞 T8 附带的 **S1 语音夹**的蓝牙收音和按�
 
 **当前正式版本：v0.2.2。** 这是独立开源项目，与讯飞、豆包、微信或 OpenAI 没有官方隶属关系。
 
+**v0.3.0 预览版新增有线耳机模式：** 使用内置 3.5mm 接口的单键线控控制输入法。[下载预览版](https://github.com/lianshuang-photo/s1-voice-bridge/releases/tag/v0.3.0) · [耳机模式使用说明](docs/HEADSET.md)。它直接使用系统麦克风，不依赖讯飞助手或虚拟音频驱动。
+
 ## 产品界面
 
 <p align="center"><img src="docs/images/app-overview.png" width="820" alt="S1 Voice Bridge 原生界面：自动连接、虚拟麦克风与 Fn 快捷键设置"></p>
@@ -61,6 +63,8 @@ S1 Voice Bridge 接收讯飞 T8 附带的 **S1 语音夹**的蓝牙收音和按�
 发布包内置 Python 3.12，无需接收方另装 Python。
 
 ## 使用前提
+
+以下为 **S1 模式**的要求。有线耳机模式的设备范围、权限和设置请看[单独说明](docs/HEADSET.md)。
 
 1. Apple Silicon Mac，macOS 13 或更高版本。
 2. 讯飞 T8 的 **S1 语音夹**。先在系统蓝牙设置中完成 S1 配对；仅配对 T8 键盘本体不够。
@@ -138,13 +142,15 @@ dist/'S1 Voice Bridge.app'/Contents/MacOS/S1VoiceBridge --self-test
 构建便携包需要 uv / python-build-standalone 提供的 CPython 3.12：
 
 ```sh
-python3 scripts/build.py --output releases/v0.2.2 --portable
-python3 scripts/package_release.py --version 0.2.2
+python3 scripts/build.py --output releases/v0.3.0 --portable
+python3 scripts/package_release.py --version 0.3.0
 ```
 
 构建阶段只打包驱动，不执行系统安装或重启音频服务。`S1_PYTHON` 可指定构建用 Python 3.12。
 
 文档界面图可通过 `python3 scripts/render_readme_screenshots.py` 重新生成；它使用隔离的示例数据，不连接硬件或触发快捷键。
+
+`S1VoiceBridge --self-test-core` 可运行不依赖讯飞助手的核心检查；`--self-test` 还会检查本机讯飞协议组件。
 
 ## 组成与许可
 

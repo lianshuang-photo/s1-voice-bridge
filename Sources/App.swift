@@ -1,7 +1,8 @@
 import SwiftUI
 import AppKit
+import Combine
 
-struct ContentView: View {
+struct S1ContentView: View {
     @ObservedObject var model: BridgeModel
     var body: some View {
         ScrollView {
@@ -15,7 +16,7 @@ struct ContentView: View {
                         Text("按住说话 · 松开结束 · 使用讯飞 S1 收音").foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("v0.2.2\n蓝牙自动连接").font(.caption.monospaced()).multilineTextAlignment(.trailing).foregroundStyle(.secondary)
+                    Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "开发版")\n蓝牙自动连接").font(.caption.monospaced()).multilineTextAlignment(.trailing).foregroundStyle(.secondary)
                 }
                 GroupBox {
                     VStack(alignment: .leading, spacing: 12) {
@@ -137,6 +138,9 @@ struct ContentView: View {
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMenuDelegate {
     let model = BridgeModel()
+    private lazy var headset = WiredHeadsetModel(directory: model.directory, initialShortcut: model.settings.shortcut, initialTriggerMode: model.settings.triggerMode)
+    private var inputSource = InputSourceMode(rawValue: UserDefaults.standard.string(forKey: "InputSource") ?? "s1") ?? .s1
+    private var subscriptions: Set<AnyCancellable> = []
     private var window: NSWindow?
     private var statusItem: NSStatusItem?
     private var connectionItem: NSMenuItem?
@@ -144,7 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 900), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = "S1 Voice Bridge"
         window.delegate = self
-        window.contentView = NSHostingView(rootView: ContentView(model: model))
+        window.contentView = NSHostingView(rootView: ContentView(model: model, headset: headset, mode: inputSource, onModeChange: { [weak self] mode in self?.switchInput(mode) }))
         window.center(); window.makeKeyAndOrderFront(nil); self.window = window
         NSApplication.shared.activate(ignoringOtherApps: true)
         let menu = NSMenu(title: "Main Menu")
@@ -163,26 +167,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSMe
         statusMenu.addItem(.separator())
         statusMenu.addItem(withTitle: "退出", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         statusItem.menu = statusMenu; self.statusItem = statusItem
-        NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in self?.model.systemWillSleep() }
-        NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in self?.model.systemDidWake() }
-        model.startAutoConnection()
+        NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.model.systemWillSleep(); self?.headset.systemWillSleep()
+        }
+        NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self else { return }
+            if self.inputSource == .s1 { self.model.systemDidWake() } else { self.headset.systemDidWake() }
+        }
+        model.objectWillChange.merge(with: headset.objectWillChange).sink { [weak self] _ in
+            DispatchQueue.main.async { self?.updateStatusItem() }
+        }.store(in: &subscriptions)
+        switchInput(inputSource)
+    }
+    private func switchInput(_ mode: InputSourceMode) {
+        inputSource = mode; UserDefaults.standard.set(mode.rawValue, forKey: "InputSource")
+        if mode == .headset { model.pauseForOtherInput(); headset.activate() }
+        else { headset.deactivate(); model.systemDidWake(); model.startAutoConnection() }
+        updateStatusItem()
+    }
+    private func updateStatusItem() {
+        let active = inputSource == .headset ? headset.sessionActive : model.recording
+        statusItem?.button?.image = NSImage(systemSymbolName: active ? "waveform.circle.fill" : (inputSource == .headset ? "headphones" : "mic"), accessibilityDescription: "S1 Voice Bridge")
+        statusItem?.button?.toolTip = inputSource == .headset ? headset.status : model.status
     }
     @objc private func showWindow() { window?.makeKeyAndOrderFront(nil); NSApplication.shared.activate(ignoringOtherApps: true) }
-    func applicationDidBecomeActive(_ notification: Notification) { model.refreshAccessibility() }
+    func applicationDidBecomeActive(_ notification: Notification) { model.refreshAccessibility(); if inputSource == .headset { headset.refresh() } }
     @objc private func connectionAction() {
+        if inputSource == .headset { headset.settings.enabled.toggle(); return }
         if model.connected || model.connecting { model.disconnect() }
         else if model.settings.lastDeviceID.isEmpty { showWindow() }
         else { model.resumeAutoConnection() }
     }
-    func menuWillOpen(_ menu: NSMenu) { connectionItem?.title = model.connected || model.connecting ? "断开并暂停自动连接" : "立即重连" }
+    func menuWillOpen(_ menu: NSMenu) {
+        connectionItem?.title = inputSource == .headset ? (headset.settings.enabled ? "停止接管耳机按键" : "接管耳机按键") : (model.connected || model.connecting ? "断开并暂停自动连接" : "立即重连")
+    }
     func windowShouldClose(_ sender: NSWindow) -> Bool { sender.orderOut(nil); return false }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool { showWindow(); return true }
-    func applicationWillTerminate(_ notification: Notification) { model.shutdown() }
+    func applicationWillTerminate(_ notification: Notification) { headset.shutdown(); model.shutdown() }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }
 
 @main struct Main {
     static func main() {
+        if CommandLine.arguments.contains("--self-test-core") { exit(SelfTests.run(includeVendorProbe: false)) }
         if CommandLine.arguments.contains("--self-test") { exit(SelfTests.run()) }
         let app = NSApplication.shared
         app.setActivationPolicy(.regular)

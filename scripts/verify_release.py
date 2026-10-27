@@ -13,7 +13,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("archive", type=Path)
     args = p.parse_args()
-    forbidden = ("live-status.json", "Recordings/", "settings.json", "iFLYAssistant.app", "python-path.txt")
+    forbidden = ("live-status.json", "headset-status.json", "Recordings/", "settings.json", "iFLYAssistant.app", "python-path.txt")
     with zipfile.ZipFile(args.archive) as z:
         assert z.testzip() is None, "ZIP integrity failure"
         for item in z.infolist():

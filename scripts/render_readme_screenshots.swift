@@ -33,9 +33,10 @@ import SwiftUI
         model.autoConnectStatus = "已连接；掉线或休眠后会自动重连。"
         model.logs = ["S1 已连接，设备握手成功。", "虚拟麦克风：S1 Bridge Audio", "快捷键：Fn · 按住型"]
 
-        let view = NSHostingView(rootView: ContentView(model: model)
+        let headset = WiredHeadsetModel(directory: scratch.appendingPathComponent("headset"))
+        let view = NSHostingView(rootView: ContentView(model: model, headset: headset)
             .background(Color(nsColor: .windowBackgroundColor))
-            .environment(\.colorScheme, .light))
+            .environment(\.colorScheme, .light).id("s1"))
         let size = NSSize(width: 940, height: 1120)
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable],
@@ -66,6 +67,14 @@ import SwiftUI
         model.autoConnectStatus = "等待记住的 S1 唤醒并连接。"
         model.logs = ["已记住上次成功连接的 S1。", "设备暂时离线，正在等待唤醒。"]
         try capture("auto-reconnect.png")
+        headset.headsetPresent = true; headset.listenGranted = true; headset.accessibility = true
+        headset.capturing = true; headset.settings.enabled = true
+        headset.status = "已接管：点一下开始说话，再点一下结束。"
+        view.rootView = ContentView(model: model, headset: headset, mode: .headset)
+            .background(Color(nsColor: .windowBackgroundColor)).environment(\.colorScheme, .light).id("headset")
+        window.setContentSize(NSSize(width: 940, height: 930))
+        view.setFrameSize(NSSize(width: 940, height: 930))
+        try capture("wired-headset.png")
         print("Saved native UI screenshots with illustrative data; no hardware actions performed.")
     }
 }

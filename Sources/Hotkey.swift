@@ -22,15 +22,19 @@ final class HotkeyOutput {
     private func post(_ shortcut: Shortcut, down: Bool) {
         observer?(down ? "down" : "up")
         guard !dryRun else { return }
-        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: shortcut.keyCode, keyDown: down) else { return }
+        guard let event = Self.makeEvent(shortcut, down: down) else { return }
+        event.post(tap: .cghidEventTap)
+    }
+    static func makeEvent(_ shortcut: Shortcut, down: Bool) -> CGEvent? {
+        guard let event = CGEvent(keyboardEventSource: nil, virtualKey: shortcut.keyCode, keyDown: down) else { return nil }
         if shortcut.isFn {
             event.type = .flagsChanged
-            event.flags = down ? [.maskSecondaryFn] : []
+            event.flags = down ? CGEventFlags(rawValue: shortcut.flags).union(.maskSecondaryFn) : []
         } else {
             event.flags = down ? CGEventFlags(rawValue: shortcut.flags) : []
         }
         event.setIntegerValueField(.eventSourceUserData, value: 0x5331425249444745)
-        event.post(tap: .cghidEventTap)
+        return event
     }
     func begin(_ shortcut: Shortcut, mode: String) throws {
         guard pressed == nil else { return }
